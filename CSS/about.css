@@ -1,0 +1,92 @@
+/* =============================================
+   NeoPulse — About Page CSS
+   ============================================= */
+
+.about-hero {
+  text-align: center;
+  padding: 60px 24px 48px;
+  position: relative;
+}
+.about-hero__orb {
+  position: absolute;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,77,255,0.18), transparent 70%);
+  top: -60px; left: 50%; transform: translateX(-50%);
+  filter: blur(60px); pointer-events: none;
+}
+.about-hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin-bottom: 16px; }
+.about-hero p  { color: var(--text-secondary); max-width: 540px; margin: 0 auto; font-size: 1rem; line-height: 1.75; }
+
+/* Tech stack grid */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-top: 24px;
+}
+.tech-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  text-align: center;
+  transition: all var(--trans);
+}
+.tech-card:hover { border-color: var(--border-glow); transform: translateY(-3px); }
+.tech-card__icon { font-size: 1.8rem; margin-bottom: 8px; }
+.tech-card__name { font-weight: 600; font-size: 0.92rem; }
+.tech-card__desc { font-size: 0.76rem; color: var(--text-muted); margin-top: 4px; }
+
+/* Two-col layout */
+.about-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+@media (max-width: 700px) { .about-cols { grid-template-columns: 1fr; } }
+
+/* Info card */
+.about-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+}
+.about-card h2 { font-size: 1.15rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.about-card p  { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.75; }
+.about-card ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.about-card ul li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  padding-left: 18px;
+  position: relative;
+  line-height: 1.6;
+}
+.about-card ul li::before { content: '✦'; position: absolute; left: 0; color: var(--accent); font-size: 0.7rem; top: 3px; }
+
+/* Keyboard shortcuts table */
+.kbd-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.kbd-table td { padding: 9px 0; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+.kbd-table tr:last-child td { border-bottom: none; }
+kbd {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  font-size: 0.78rem;
+  font-family: monospace;
+  color: var(--accent-light);
+}
+
+/* Version badge */
+.version-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 99px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(124,77,255,0.3);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent-light);
+  margin-bottom: 12px;
+}
