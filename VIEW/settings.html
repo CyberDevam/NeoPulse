@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NeoPulse Settings – Customize your Pomodoro durations, theme, and preferences.">
+  <link rel="stylesheet" href="../CSS/shared.css">
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <link rel="stylesheet" href="../CSS/settings.css">
+  <title>NeoPulse – Settings</title>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div id="navbar-placeholder"></div>
+
+<main class="page-container">
+
+  <div style="margin-bottom:28px" class="anim-fadeUp">
+    <h1 style="font-size:1.8rem;margin-bottom:4px">⚙️ Settings</h1>
+    <p style="color:var(--text-secondary);font-size:0.9rem">Customize NeoPulse to match your workflow</p>
+  </div>
+
+  <div class="settings-layout">
+
+    <!-- Sidebar Nav -->
+    <div class="settings-nav anim-fadeUp" style="animation-delay:0.06s">
+      <a href="#pomodoro" class="active" onclick="setActive(this)">🍅 Pomodoro</a>
+      <a href="#appearance" onclick="setActive(this)">🎨 Appearance</a>
+      <a href="#notifications" onclick="setActive(this)">🔔 Notifications</a>
+      <a href="#data" onclick="setActive(this)">💾 Data</a>
+    </div>
+
+    <!-- Settings Content -->
+    <div class="settings-content anim-fadeUp" style="animation-delay:0.12s">
+
+      <!-- Pomodoro Section -->
+      <div class="settings-card" id="pomodoro">
+        <h2>🍅 Pomodoro Durations</h2>
+        <p class="card-sub">Customize your focus and break lengths. Changes apply immediately on the Pomodoro page.</p>
+
+        <div class="settings-row">
+          <div class="settings-row__info">
+            <div class="settings-row__label">Focus Duration</div>
+            <div class="settings-row__desc">Length of each focus session</div>
+          </div>
+          <div class="range-group">
+            <input type="range" id="focus-dur" min="5" max="90" step="5" value="25">
+            <span class="range-val" id="focus-dur-val">25 min</span>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row__info">
+            <div class="settings-row__label">Short Break</div>
+            <div class="settings-row__desc">Rest between focus sessions</div>
+          </div>
+          <div class="range-group">
+            <input type="range" id="short-dur" min="1" max="30" step="1" value="5">
+            <span class="range-val" id="short-dur-val">5 min</span>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row__info">
+            <div class="settings-row__label">Long Break</div>
+            <div class="settings-row__desc">Rest after every N sessions</div>
+          </div>
+          <div class="range-group">
+            <input type="range" id="long-dur" min="5" max="60" step="5" value="15">
+            <span class="range-val" id="long-dur-val">15 min</span>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row__info">
+            <div class="settings-row__label">Long Break After</div>
+            <div class="settings-row__desc">Number of focus sessions before a long break</div>
+          </div>
+          <div class="range-group">
+            <input type="range" id="long-after" min="2" max="8" step="1" value="4">
+            <span class="range-val" id="long-after-val">4 sessions</span>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row__info">
+            <div class="settings-row__label">Auto-Start Breaks</div>
+            <div class="settings-row__desc">Automatically start break after a focus session ends</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="auto-break">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row__info">
+            <div class="settings-row__label">Auto-Start Focus</div>
+            <div class="settings-row__desc">Automatically start next focus after a break</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="auto-focus">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Appearance Section -->
+      <div class="settings-card" id="appearance">
+        <h2>🎨 Appearance</h2>
+        <p class="card-sub">Choose a theme and toggle between dark &amp; light mode. Changes apply instantly across all pages.</p>
+
+        <!-- Dark/Light toggle row -->
+        <div class="settings-row">
+          <div class="settings-row__info">
+            <div class="settings-row__label">Dark / Light Mode</div>
+            <div class="settings-row__desc">Toggle between dark and light variant of the current theme</div>
+          </div>
+          <button class="mode-toggle-btn" id="mode-toggle-btn">
+            <span id="mode-toggle-icon">☀️</span>
+            <span id="mode-toggle-label">Switch to Light</span>
+          </button>
+        </div>
+
+        <!-- Theme picker -->
+        <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:16px;">
+          <div class="settings-row__info">
+            <div class="settings-row__label">Theme</div>
+            <div class="settings-row__desc">Pick a full color theme — dark and light variants share the same hue family</div>
+          </div>
+
+          <div class="theme-section-label">🌑 Dark Themes</div>
+          <div class="theme-card-grid" id="dark-theme-grid">
+            <div class="theme-card" data-theme="dark-nebula" data-mode="dark">
+              <div class="theme-card__preview">
+                <span style="background:#0a0a0f"></span>
+                <span style="background:#7c4dff"></span>
+                <span style="background:#00e5ff"></span>
+                <span style="background:#ff4081"></span>
+              </div>
+              <div class="theme-card__name">Dark Nebula</div>
+            </div>
+            <div class="theme-card" data-theme="dark-ocean" data-mode="dark">
+              <div class="theme-card__preview">
+                <span style="background:#030b18"></span>
+                <span style="background:#0097ff"></span>
+                <span style="background:#00e5ff"></span>
+                <span style="background:#ff6b35"></span>
+              </div>
+              <div class="theme-card__name">Midnight Ocean</div>
+            </div>
+            <div class="theme-card" data-theme="dark-forest" data-mode="dark">
+              <div class="theme-card__preview">
+                <span style="background:#050f09"></span>
+                <span style="background:#00c853"></span>
+                <span style="background:#64ffda"></span>
+                <span style="background:#ffab40"></span>
+              </div>
+              <div class="theme-card__name">Forest Dusk</div>
+            </div>
+            <div class="theme-card" data-theme="dark-crimson" data-mode="dark">
+              <div class="theme-card__preview">
+                <span style="background:#0f0508"></span>
+                <span style="background:#ff1744"></span>
+                <span style="background:#ff6d00"></span>
+                <span style="background:#ff80ab"></span>
+              </div>
+              <div class="theme-card__name">Crimson Dusk</div>
+            </div>
+            <div class="theme-card" data-theme="dark-solar" data-mode="dark">
+              <div class="theme-card__preview">
+                <span style="background:#0f0800"></span>
+                <span style="background:#ff6d00"></span>
+                <span style="background:#ffd740"></span>
+                <span style="background:#ff4081"></span>
+              </div>
+              <div class="theme-card__name">Solar Flare</div>
+            </div>
+            <div class="theme-card" data-theme="dark-rose" data-mode="dark">
+              <div class="theme-card__preview">
+                <span style="background:#0f0510"></span>
+                <span style="background:#e040fb"></span>
+                <span style="background:#00e5ff"></span>
+                <span style="background:#ff6d00"></span>
+              </div>
+              <div class="theme-card__name">Cyber Rose</div>
+            </div>
+          </div>
+
+          <div class="theme-section-label">☀️ Light Themes</div>
+          <div class="theme-card-grid" id="light-theme-grid">
+            <div class="theme-card" data-theme="light-cloud" data-mode="light">
+              <div class="theme-card__preview">
+                <span style="background:#f5f5ff"></span>
+                <span style="background:#7c4dff"></span>
+                <span style="background:#0097ff"></span>
+                <span style="background:#ff4081"></span>
+              </div>
+              <div class="theme-card__name">Cloud</div>
+            </div>
+            <div class="theme-card" data-theme="light-arctic" data-mode="light">
+              <div class="theme-card__preview">
+                <span style="background:#eaf9ff"></span>
+                <span style="background:#0097c7"></span>
+                <span style="background:#00e5ff"></span>
+                <span style="background:#ff6d00"></span>
+              </div>
+              <div class="theme-card__name">Arctic</div>
+            </div>
+            <div class="theme-card" data-theme="light-mint" data-mode="light">
+              <div class="theme-card__preview">
+                <span style="background:#eafaf2"></span>
+                <span style="background:#00897b"></span>
+                <span style="background:#69f0ae"></span>
+                <span style="background:#ffab40"></span>
+              </div>
+              <div class="theme-card__name">Mint</div>
+            </div>
+            <div class="theme-card" data-theme="light-sunset" data-mode="light">
+              <div class="theme-card__preview">
+                <span style="background:#fff8f0"></span>
+                <span style="background:#f4511e"></span>
+                <span style="background:#ffa000"></span>
+                <span style="background:#e040fb"></span>
+              </div>
+              <div class="theme-card__name">Sunset</div>
+            </div>
+            <div class="theme-card" data-theme="light-rose" data-mode="light">
+              <div class="theme-card__preview">
+                <span style="background:#fff0f8"></span>
+                <span style="background:#e91e63"></span>
+                <span style="background:#e040fb"></span>
+                <span style="background:#ff6d00"></span>
+              </div>
+              <div class="theme-card__name">Rose Quartz</div>
+            </div>
+            <div class="theme-card" data-theme="light-parchment" data-mode="light">
+              <div class="theme-card__preview">
+                <span style="background:#faf6ef"></span>
+                <span style="background:#8d5a00"></span>
+                <span style="background:#c0392b"></span>
+                <span style="background:#27ae60"></span>
+              </div>
+              <div class="theme-card__name">Parchment</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row__info">
+            <div class="settings-row__label">Font Size</div>
+            <div class="settings-row__desc">Base text size across all pages</div>
+          </div>
+          <select class="settings-select" id="font-size">
+            <option value="14">Small (14px)</option>
+            <option value="16" selected>Medium (16px)</option>
+            <option value="18">Large (18px)</option>
+          </select>
+        </div>
+      </div>
+
+
+      <!-- Notifications -->
+      <div class="settings-card" id="notifications">
+        <h2>🔔 Notifications</h2>
+        <p class="card-sub">Control how NeoPulse alerts you.</p>
+
+        <div class="settings-row">
+          <div class="settings-row__info">
+            <div class="settings-row__label">Audio Alerts</div>
+            <div class="settings-row__desc">Play a sound when a session ends</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="audio-alerts" checked>
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row__info">
+            <div class="settings-row__label">Browser Notifications</div>
+            <div class="settings-row__desc">Show browser pop-up when a session ends</div>
+          </div>
+          <button class="btn btn-secondary" id="notif-btn" style="font-size:0.82rem;padding:7px 14px">Request Permission</button>
+        </div>
+      </div>
+
+      <!-- Data Section -->
+      <div class="settings-card danger-card" id="data">
+        <h2>💾 Data Management</h2>
+        <p class="card-sub">Manage your locally stored notes and settings.</p>
+
+        <div class="settings-row">
+          <div class="settings-row__info">
+            <div class="settings-row__label">Export Notes</div>
+            <div class="settings-row__desc">Download all your notes as JSON</div>
+          </div>
+          <button class="btn btn-secondary" id="export-btn">⬇️ Export</button>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row__info">
+            <div class="settings-row__label">Import Notes</div>
+            <div class="settings-row__desc">Restore notes from a JSON backup</div>
+          </div>
+          <label class="btn btn-secondary" style="cursor:pointer">
+            ⬆️ Import
+            <input type="file" accept=".json" id="import-file" style="display:none">
+          </label>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row__info">
+            <div class="settings-row__label" style="color:var(--danger)">Delete All Notes</div>
+            <div class="settings-row__desc">Permanently remove all notes from this device</div>
+          </div>
+          <button class="btn btn-danger" id="delete-all-btn">🗑️ Delete All</button>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row__info">
+            <div class="settings-row__label">Reset Settings</div>
+            <div class="settings-row__desc">Restore all settings to defaults</div>
+          </div>
+          <button class="btn btn-secondary" id="reset-settings-btn">↩️ Reset</button>
+        </div>
+      </div>
+
+    </div><!-- /.settings-content -->
+  </div><!-- /.settings-layout -->
+
+  <!-- Save Button -->
+  <div style="display:flex;justify-content:flex-end;margin-top:20px;gap:10px">
+    <button class="btn btn-secondary" onclick="loadSettings()">↩ Revert</button>
+    <button class="btn btn-primary" id="save-settings-btn">💾 Save Settings</button>
+  </div>
+
+</main>
+
+<!-- Toast -->
+<div id="toast-container"></div>
+
+<script>
+  // ── Load Navbar ──────────────────────────────
+  fetch('../Components/navbar.html')
+    .then(r => r.text())
+    .then(html => {
+      const ph = document.getElementById('navbar-placeholder');
+      ph.innerHTML = html;
+      ph.querySelectorAll('script').forEach(s => {
+        const ns = document.createElement('script'); ns.textContent = s.textContent; document.body.appendChild(ns);
+      });
+      document.querySelectorAll('.navbar__links a').forEach(a => {
+        if (a.getAttribute('href')?.includes('settings')) a.classList.add('active');
+      });
+    })
+    .catch(() => {
+      document.getElementById('navbar-placeholder').innerHTML = `<nav class="navbar">
+        <a href="landing.html" class="navbar__brand"><div class="navbar__logo">⚡</div><span class="navbar__brand-name">NeoPulse</span></a>
+        <ul class="navbar__links">
+          <li><a href="home.html"><span class="nav-icon">📝</span> Notes</a></li>
+          <li><a href="pomodoroTimer.html"><span class="nav-icon">🍅</span> Pomodoro</a></li>
+          <li><a href="about.html"><span class="nav-icon">✨</span> About</a></li>
+          <li><a href="settings.html" class="active"><span class="nav-icon">⚙️</span> Settings</a></li>
+        </ul></nav>`;
+    });
+
+  // ── Settings Nav ──────────────────────────────
+  function setActive(el) {
+    document.querySelectorAll('.settings-nav a').forEach(a => a.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // ══════════════════════════════════════════════
+  //  THEME ENGINE (mirrors navbar.html engine)
+  // ══════════════════════════════════════════════
+  const THEME_KEY = 'neo_theme';
+  const MODE_KEY  = 'neo_mode';
+  const DARK_THEMES  = ['dark-nebula','dark-ocean','dark-forest','dark-crimson','dark-solar','dark-rose'];
+  const LIGHT_THEMES = ['light-cloud','light-arctic','light-mint','light-sunset','light-rose','light-parchment'];
+
+  function getTheme() { return localStorage.getItem(THEME_KEY) || 'dark-nebula'; }
+  function getMode()  { return localStorage.getItem(MODE_KEY)  || 'dark'; }
+
+  function applyTheme(theme, mode) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    localStorage.setItem(MODE_KEY, mode);
+    highlightActiveThemeCard(theme);
+    updateModeToggleUI(mode);
+  }
+
+  function highlightActiveThemeCard(theme) {
+    document.querySelectorAll('.theme-card').forEach(c => {
+      c.classList.toggle('active', c.dataset.theme === theme);
+    });
+  }
+
+  function updateModeToggleUI(mode) {
+    const isDark = mode === 'dark';
+    const icon  = document.getElementById('mode-toggle-icon');
+    const label = document.getElementById('mode-toggle-label');
+    if (icon)  icon.textContent  = isDark ? '☀️' : '🌙';
+    if (label) label.textContent = isDark ? 'Switch to Light' : 'Switch to Dark';
+  }
+
+  // Theme card clicks
+  document.querySelectorAll('.theme-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const theme = card.dataset.theme;
+      const mode  = card.dataset.mode;
+      applyTheme(theme, mode);
+    });
+  });
+
+  // Mode toggle button in settings
+  document.getElementById('mode-toggle-btn').addEventListener('click', () => {
+    const current = getTheme();
+    const mode    = getMode();
+    let newTheme, newMode;
+    if (mode === 'dark') {
+      const idx = DARK_THEMES.indexOf(current);
+      newTheme = (idx >= 0) ? LIGHT_THEMES[idx] : 'light-cloud';
+      newMode  = 'light';
+    } else {
+      const idx = LIGHT_THEMES.indexOf(current);
+      newTheme = (idx >= 0) ? DARK_THEMES[idx] : 'dark-nebula';
+      newMode  = 'dark';
+    }
+    applyTheme(newTheme, newMode);
+  });
+
+  // Init theme on page load
+  (function() {
+    const theme = getTheme();
+    const mode  = getMode();
+    applyTheme(theme, mode);
+  })();
+
+  // ── Defaults ─────────────────────────────────
+  const DEFAULTS = { focusDur: 25, shortDur: 5, longDur: 15, longAfter: 4, autoBreak: false, autoFocus: false, fontSize: 16, audioAlerts: true };
+
+  function loadSettings() {
+    let s;
+    try { s = { ...DEFAULTS, ...JSON.parse(localStorage.getItem('neo_settings') || '{}') }; }
+    catch { s = { ...DEFAULTS }; }
+
+    document.getElementById('focus-dur').value  = s.focusDur;
+    document.getElementById('short-dur').value  = s.shortDur;
+    document.getElementById('long-dur').value   = s.longDur;
+    document.getElementById('long-after').value = s.longAfter;
+    document.getElementById('auto-break').checked = !!s.autoBreak;
+    document.getElementById('auto-focus').checked = !!s.autoFocus;
+    document.getElementById('audio-alerts').checked = s.audioAlerts !== false;
+    document.getElementById('font-size').value  = s.fontSize || 16;
+
+    updateRangeLabels();
+    // Font size
+    document.documentElement.style.fontSize = (s.fontSize || 16) + 'px';
+    // Theme is already applied by initTheme, keep it consistent
+    highlightActiveThemeCard(getTheme());
+    updateModeToggleUI(getMode());
+  }
+
+  function updateRangeLabels() {
+    document.getElementById('focus-dur-val').textContent  = document.getElementById('focus-dur').value + ' min';
+    document.getElementById('short-dur-val').textContent  = document.getElementById('short-dur').value + ' min';
+    document.getElementById('long-dur-val').textContent   = document.getElementById('long-dur').value + ' min';
+    document.getElementById('long-after-val').textContent = document.getElementById('long-after').value + ' sessions';
+  }
+
+  // Live range label updates
+  ['focus-dur','short-dur','long-dur','long-after'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateRangeLabels);
+  });
+
+  // Font size live update
+  document.getElementById('font-size').addEventListener('change', () => {
+    document.documentElement.style.fontSize = document.getElementById('font-size').value + 'px';
+  });
+
+  // ── Save ─────────────────────────────────────
+  document.getElementById('save-settings-btn').addEventListener('click', () => {
+    const s = {
+      focusDur:    +document.getElementById('focus-dur').value,
+      shortDur:    +document.getElementById('short-dur').value,
+      longDur:     +document.getElementById('long-dur').value,
+      longAfter:   +document.getElementById('long-after').value,
+      autoBreak:   document.getElementById('auto-break').checked,
+      autoFocus:   document.getElementById('auto-focus').checked,
+      audioAlerts: document.getElementById('audio-alerts').checked,
+      fontSize:    +document.getElementById('font-size').value,
+    };
+    localStorage.setItem('neo_settings', JSON.stringify(s));
+    showToast('Settings saved! ✅', 'success');
+  });
+
+  // ── Reset settings ───────────────────────────
+  document.getElementById('reset-settings-btn').addEventListener('click', () => {
+    if (!confirm('Reset all settings to defaults?')) return;
+    localStorage.removeItem('neo_settings');
+    // Reset theme to default dark
+    applyTheme('dark-nebula', 'dark');
+    loadSettings();
+    showToast('Settings reset to defaults', 'info');
+  });
+
+  // ── Export / Import ──────────────────────────
+  document.getElementById('export-btn').addEventListener('click', () => {
+    const notes = localStorage.getItem('neo_notes') || '[]';
+    const blob  = new Blob([notes], { type: 'application/json' });
+    const url   = URL.createObjectURL(blob);
+    const a     = document.createElement('a');
+    a.href = url; a.download = `neopulse-notes-${Date.now()}.json`;
+    a.click(); URL.revokeObjectURL(url);
+    showToast('Notes exported!', 'success');
+  });
+
+  document.getElementById('import-file').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const notes = JSON.parse(reader.result);
+        if (!Array.isArray(notes)) throw new Error();
+        const existing = JSON.parse(localStorage.getItem('neo_notes') || '[]');
+        const merged   = [...notes, ...existing.filter(e => !notes.find(n => n.id === e.id))];
+        localStorage.setItem('neo_notes', JSON.stringify(merged));
+        showToast(`Imported ${notes.length} notes!`, 'success');
+      } catch { showToast('Invalid JSON file', 'error'); }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  // ── Delete all notes ─────────────────────────
+  document.getElementById('delete-all-btn').addEventListener('click', () => {
+    if (!confirm('Delete ALL notes permanently? This cannot be undone!')) return;
+    localStorage.removeItem('neo_notes');
+    showToast('All notes deleted', 'info');
+  });
+
+  // ── Browser Notifications ────────────────────
+  document.getElementById('notif-btn').addEventListener('click', async () => {
+    if (!('Notification' in window)) { showToast('Notifications not supported', 'error'); return; }
+    const perm = await Notification.requestPermission();
+    if (perm === 'granted') {
+      showToast('Notifications enabled! ✅', 'success');
+      document.getElementById('notif-btn').textContent = '✅ Enabled';
+    } else {
+      showToast('Notifications denied', 'error');
+    }
+  });
+
+  if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+    document.getElementById('notif-btn').textContent = '✅ Enabled';
+  }
+
+  // ── Toast ────────────────────────────────────
+  function showToast(msg, type = 'info') {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<span>${type==='success'?'✅':type==='error'?'❌':'ℹ️'}</span> ${msg}`;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  // ── Init ─────────────────────────────────────
+  loadSettings();
+</script>
+</body>
+</html>

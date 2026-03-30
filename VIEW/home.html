@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NeoPulse Notes – All your notes in one place. Create, search, filter and manage your notes.">
+  <link rel="stylesheet" href="../CSS/shared.css">
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <link rel="stylesheet" href="../CSS/home.css">
+  <title>NeoPulse – My Notes</title>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div id="navbar-placeholder"></div>
+
+<main class="page-container">
+
+  <!-- Header -->
+  <div class="notes-header anim-fadeUp">
+    <div class="notes-header__left">
+      <h1>📝 My Notes</h1>
+      <p>All your ideas, captured and organized</p>
+    </div>
+    <a href="createEdit.html" class="btn btn-primary" id="new-note-btn">+ New Note</a>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar anim-fadeUp" style="animation-delay:0.08s" id="stats-bar">
+    <div class="stat-chip">
+      <span class="stat-chip__num" id="stat-total">0</span>
+      <span class="stat-chip__label">Total Notes</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-chip__num" id="stat-today">0</span>
+      <span class="stat-chip__label">Created Today</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-chip__num" id="stat-words">0</span>
+      <span class="stat-chip__label">Total Words</span>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="notes-toolbar anim-fadeUp" style="animation-delay:0.14s">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="input-field" id="search-input" placeholder="Search notes…">
+    </div>
+    <button class="filter-btn active" data-sort="newest">🕐 Newest</button>
+    <button class="filter-btn" data-sort="oldest">🕙 Oldest</button>
+    <button class="filter-btn" data-sort="az">A–Z</button>
+    <!-- Color filters -->
+    <button class="color-filter-btn" data-color="all" title="All" style="background:linear-gradient(135deg,#7c4dff,#00e5ff);width:28px;height:28px"></button>
+    <button class="color-filter-btn" data-color="#7c4dff" style="background:#7c4dff"></button>
+    <button class="color-filter-btn" data-color="#00e5ff" style="background:#00e5ff"></button>
+    <button class="color-filter-btn" data-color="#ff4081" style="background:#ff4081"></button>
+    <button class="color-filter-btn" data-color="#00e676" style="background:#00e676"></button>
+    <button class="color-filter-btn" data-color="#ffd740" style="background:#ffd740"></button>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" id="empty-state">
+    <div class="empty-state__icon">🗒️</div>
+    <h3>No notes yet</h3>
+    <p>Hit "New Note" to capture your first idea</p>
+    <a href="createEdit.html" class="btn btn-primary">Create First Note</a>
+  </div>
+
+  <!-- Notes Grid -->
+  <div class="notes-grid anim-fadeUp" style="animation-delay:0.2s" id="notes-grid"></div>
+
+</main>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- Confirm Dialog -->
+<div id="confirm-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px)">
+  <div class="glass" style="padding:28px 32px;max-width:360px;width:90%;text-align:center">
+    <div style="font-size:2rem;margin-bottom:12px">🗑️</div>
+    <h3 style="margin-bottom:8px">Delete Note?</h3>
+    <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:24px">This action cannot be undone.</p>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn btn-secondary" id="confirm-cancel">Cancel</button>
+      <button class="btn btn-danger" id="confirm-delete">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- Constants ----
+  const STORAGE_KEY = 'neo_notes';
+  const NOTE_COLORS = ['#7c4dff','#00e5ff','#ff4081','#00e676','#ffd740','#ff6d00','#ea80fc','#80d8ff'];
+
+  // ---- Load navbar ----
+  const placeholder = document.getElementById('navbar-placeholder');
+  fetch('../Components/navbar.html')
+    .then(r => r.text())
+    .then(html => {
+      placeholder.innerHTML = html;
+      placeholder.querySelectorAll('script').forEach(s => {
+        const ns = document.createElement('script'); ns.textContent = s.textContent; document.body.appendChild(ns);
+      });
+      setActive();
+    })
+    .catch(() => {
+      placeholder.innerHTML = buildFallbackNav('home.html');
+    });
+
+  function buildFallbackNav(activePage) {
+    return `<nav class="navbar">
+      <a href="landing.html" class="navbar__brand"><div class="navbar__logo">⚡</div><span class="navbar__brand-name">NeoPulse</span></a>
+      <ul class="navbar__links">
+        <li><a href="home.html" class="${activePage==='home.html'?'active':''}"><span class="nav-icon">📝</span> Notes</a></li>
+        <li><a href="pomodoroTimer.html"><span class="nav-icon">🍅</span> Pomodoro</a></li>
+        <li><a href="about.html"><span class="nav-icon">✨</span> About</a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Settings</a></li>
+      </ul></nav>`;
+  }
+
+  function setActive() {
+    document.querySelectorAll('.navbar__links a, .navbar__drawer a').forEach(a => {
+      if (a.getAttribute('href') === 'home.html' || a.getAttribute('href')?.includes('home')) a.classList.add('active');
+    });
+  }
+
+  // ---- Notes Storage ----
+  function getNotes() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  function saveNotes(notes) { localStorage.setItem(STORAGE_KEY, JSON.stringify(notes)); }
+
+  // ---- State ----
+  let allNotes = getNotes();
+  let sortBy   = 'newest';
+  let colorFilter = 'all';
+  let searchQ  = '';
+  let deleteId = null;
+
+  // ---- Render ----
+  function renderNotes() {
+    let notes = [...allNotes];
+
+    // Filter by search
+    if (searchQ) {
+      const q = searchQ.toLowerCase();
+      notes = notes.filter(n => n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q));
+    }
+    // Filter by color
+    if (colorFilter !== 'all') {
+      notes = notes.filter(n => n.color === colorFilter);
+    }
+    // Sort
+    if (sortBy === 'newest') notes.sort((a,b) => b.updatedAt - a.updatedAt);
+    else if (sortBy === 'oldest') notes.sort((a,b) => a.updatedAt - b.updatedAt);
+    else if (sortBy === 'az') notes.sort((a,b) => a.title.localeCompare(b.title));
+
+    // Update stats
+    const today = new Date().toDateString();
+    document.getElementById('stat-total').textContent = allNotes.length;
+    document.getElementById('stat-today').textContent = allNotes.filter(n => new Date(n.createdAt).toDateString() === today).length;
+    const words = allNotes.reduce((acc, n) => acc + (n.content.trim() ? n.content.trim().split(/\s+/).length : 0), 0);
+    document.getElementById('stat-words').textContent = words.toLocaleString();
+
+    // Empty state
+    const grid = document.getElementById('notes-grid');
+    const emptyState = document.getElementById('empty-state');
+    if (notes.length === 0) {
+      grid.innerHTML = '';
+      emptyState.classList.add('visible');
+      return;
+    }
+    emptyState.classList.remove('visible');
+
+    // Render cards
+    grid.innerHTML = notes.map(note => {
+      const date = new Date(note.updatedAt);
+      const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const preview = note.content.replace(/\n+/g, ' ').slice(0, 240);
+      return `<div class="note-card" style="--card-color:${note.color || 'var(--accent)'}"
+              onclick="openNote('${note.id}')">
+        <div class="note-card__header">
+          <div class="note-card__title">${escapeHtml(note.title || 'Untitled')}</div>
+          <div class="note-card__actions">
+            <button class="btn-icon" title="Edit" onclick="event.stopPropagation(); editNote('${note.id}')">✏️</button>
+            <button class="btn-icon" title="Delete" onclick="event.stopPropagation(); confirmDelete('${note.id}')">🗑️</button>
+          </div>
+        </div>
+        <div class="note-card__content">${escapeHtml(preview) || '<span style="color:var(--text-muted)">No content yet…</span>'}</div>
+        <div class="note-card__meta">
+          <span class="note-card__date">${dateStr}</span>
+          <div class="note-card__color-dot"></div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ---- Actions ----
+  function openNote(id) { editNote(id); }
+  function editNote(id) { location.href = `createEdit.html?id=${id}`; }
+  function confirmDelete(id) {
+    deleteId = id;
+    const ov = document.getElementById('confirm-overlay');
+    ov.style.display = 'flex';
+  }
+
+  document.getElementById('confirm-cancel').onclick = () => {
+    document.getElementById('confirm-overlay').style.display = 'none';
+    deleteId = null;
+  };
+  document.getElementById('confirm-delete').onclick = () => {
+    if (!deleteId) return;
+    allNotes = allNotes.filter(n => n.id !== deleteId);
+    saveNotes(allNotes);
+    document.getElementById('confirm-overlay').style.display = 'none';
+    deleteId = null;
+    renderNotes();
+    showToast('Note deleted', 'info');
+  };
+
+  // ---- Search ----
+  document.getElementById('search-input').addEventListener('input', e => {
+    searchQ = e.target.value.trim();
+    renderNotes();
+  });
+
+  // ---- Sort buttons ----
+  document.querySelectorAll('.filter-btn[data-sort]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn[data-sort]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      sortBy = btn.dataset.sort;
+      renderNotes();
+    });
+  });
+
+  // ---- Color filter buttons ----
+  document.querySelectorAll('.color-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.color-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      colorFilter = btn.dataset.color;
+      renderNotes();
+    });
+  });
+  // Activate "all" by default
+  document.querySelector('.color-filter-btn[data-color="all"]').classList.add('active');
+
+  // ---- Toast ----
+  function showToast(msg, type = 'info') {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span> ${msg}`;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  // ---- Init ----
+  renderNotes();
+</script>
+</body>
+</html>

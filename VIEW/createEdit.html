@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NeoPulse – Create or edit a note. Rich text editing with color labels.">
+  <link rel="stylesheet" href="../CSS/shared.css">
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <link rel="stylesheet" href="../CSS/createEdit.css">
+  <title>NeoPulse – Note Editor</title>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div id="navbar-placeholder"></div>
+
+<main class="page-container">
+
+  <!-- Page Header -->
+  <div class="editor-page-header anim-fadeUp">
+    <a href="home.html" class="back-btn">← Back to Notes</a>
+    <h1 id="page-title">New Note</h1>
+  </div>
+
+  <!-- Layout -->
+  <div class="editor-layout">
+
+    <!-- Editor Panel -->
+    <div class="editor-panel anim-fadeUp" style="animation-delay:0.06s">
+      <div class="editor-topbar">
+        <div class="editor-topbar__left">
+          <span style="font-size:0.8rem;color:var(--text-muted)">EDITING</span>
+          <span class="badge badge-accent" id="edit-mode-badge">New Note</span>
+        </div>
+        <div class="editor-topbar__right">
+          <button class="btn btn-secondary" onclick="location.href='home.html'">Discard</button>
+          <button class="btn btn-primary" id="save-btn">💾 Save Note</button>
+        </div>
+      </div>
+
+      <input type="text" class="editor-title-input" id="note-title" placeholder="Note title…" maxlength="100">
+
+      <textarea class="editor-textarea" id="note-content" placeholder="Start writing your note here…
+
+You can write anything — ideas, plans, summaries, code snippets, meeting notes…
+
+Tip: Notes are auto-saved to your browser and never leave your device."></textarea>
+
+      <div class="editor-statusbar">
+        <span id="word-count">0 words · 0 characters</span>
+        <span class="saved-indicator" id="saved-indicator">✅ Saved</span>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar-panel anim-fadeUp" style="animation-delay:0.12s">
+
+      <!-- Color Label -->
+      <div class="sidebar-card">
+        <h4>🎨 Color Label</h4>
+        <div class="color-picker-grid" id="color-picker">
+          <div class="color-swatch selected" data-color="#7c4dff" style="background:#7c4dff"></div>
+          <div class="color-swatch" data-color="#00e5ff" style="background:#00e5ff"></div>
+          <div class="color-swatch" data-color="#ff4081" style="background:#ff4081"></div>
+          <div class="color-swatch" data-color="#00e676" style="background:#00e676"></div>
+          <div class="color-swatch" data-color="#ffd740" style="background:#ffd740"></div>
+          <div class="color-swatch" data-color="#ff6d00" style="background:#ff6d00"></div>
+          <div class="color-swatch" data-color="#ea80fc" style="background:#ea80fc"></div>
+          <div class="color-swatch" data-color="#80d8ff" style="background:#80d8ff"></div>
+          <div class="color-swatch" data-color="#69f0ae" style="background:#69f0ae"></div>
+          <div class="color-swatch" data-color="#ff5252" style="background:#ff5252"></div>
+        </div>
+      </div>
+
+      <!-- Note Info -->
+      <div class="sidebar-card" id="note-info-card">
+        <h4>📋 Note Info</h4>
+        <div style="display:flex;flex-direction:column;gap:10px;font-size:0.85rem">
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:var(--text-muted)">Created</span>
+            <span id="info-created" style="color:var(--text-secondary)">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:var(--text-muted)">Updated</span>
+            <span id="info-updated" style="color:var(--text-secondary)">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:var(--text-muted)">Words</span>
+            <span id="info-words" style="color:var(--text-secondary)">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Tips -->
+      <div class="sidebar-card">
+        <h4>💡 Tips</h4>
+        <ul style="font-size:0.82rem;color:var(--text-muted);line-height:1.8;padding-left:14px">
+          <li>Pick a color to categorize your note</li>
+          <li>Notes are saved to your browser</li>
+          <li>Use the search on the Notes page to find anything fast</li>
+          <li>Start a Pomodoro session while writing for max focus</li>
+        </ul>
+      </div>
+
+      <!-- Delete (if editing) -->
+      <div id="delete-section" style="display:none">
+        <button class="btn btn-danger" id="delete-btn" style="width:100%">🗑️ Delete Note</button>
+      </div>
+    </div>
+
+  </div><!-- /.editor-layout -->
+</main>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script>
+  // ---- Load Navbar ----
+  fetch('../Components/navbar.html')
+    .then(r => r.text())
+    .then(html => {
+      const ph = document.getElementById('navbar-placeholder');
+      ph.innerHTML = html;
+      ph.querySelectorAll('script').forEach(s => {
+        const ns = document.createElement('script'); ns.textContent = s.textContent; document.body.appendChild(ns);
+      });
+    })
+    .catch(() => {
+      document.getElementById('navbar-placeholder').innerHTML = `<nav class="navbar">
+        <a href="landing.html" class="navbar__brand"><div class="navbar__logo">⚡</div><span class="navbar__brand-name">NeoPulse</span></a>
+        <ul class="navbar__links">
+          <li><a href="home.html" class="active"><span class="nav-icon">📝</span> Notes</a></li>
+          <li><a href="pomodoroTimer.html"><span class="nav-icon">🍅</span> Pomodoro</a></li>
+          <li><a href="about.html"><span class="nav-icon">✨</span> About</a></li>
+          <li><a href="settings.html"><span class="nav-icon">⚙️</span> Settings</a></li>
+        </ul></nav>`;
+    });
+
+  // ---- Constants ----
+  const STORAGE_KEY = 'neo_notes';
+  const params = new URLSearchParams(location.search);
+  const noteId = params.get('id');
+
+  let note = {
+    id:        noteId || crypto.randomUUID(),
+    title:     '',
+    content:   '',
+    color:     '#7c4dff',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+  let isEditing = !!noteId;
+
+  // ---- Load if editing ----
+  if (isEditing) {
+    const notes = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    const existing = notes.find(n => n.id === noteId);
+    if (existing) {
+      note = { ...existing };
+      document.getElementById('note-title').value   = note.title;
+      document.getElementById('note-content').value = note.content;
+      document.getElementById('page-title').textContent     = 'Edit Note';
+      document.getElementById('edit-mode-badge').textContent = 'Editing';
+      document.getElementById('delete-section').style.display = 'block';
+      // Color
+      document.querySelectorAll('.color-swatch').forEach(s => {
+        s.classList.toggle('selected', s.dataset.color === note.color);
+      });
+      updateNoteInfo();
+    } else {
+      isEditing = false;
+    }
+  }
+
+  // ---- Word count ----
+  function updateWordCount() {
+    const content = document.getElementById('note-content').value;
+    const words = content.trim() ? content.trim().split(/\s+/).length : 0;
+    document.getElementById('word-count').textContent = `${words} word${words!==1?'s':''} · ${content.length} characters`;
+    document.getElementById('info-words').textContent = words;
+  }
+  document.getElementById('note-content').addEventListener('input', updateWordCount);
+
+  function updateNoteInfo() {
+    const fmt = ts => new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    document.getElementById('info-created').textContent = fmt(note.createdAt);
+    document.getElementById('info-updated').textContent = fmt(note.updatedAt);
+  }
+
+  // ---- Color picker ----
+  document.querySelectorAll('.color-swatch').forEach(swatch => {
+    swatch.addEventListener('click', () => {
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+      swatch.classList.add('selected');
+      note.color = swatch.dataset.color;
+    });
+  });
+
+  // ---- Save ----
+  function saveNote() {
+    const title   = document.getElementById('note-title').value.trim();
+    const content = document.getElementById('note-content').value.trim();
+    if (!title && !content) {
+      showToast('Add a title or content before saving', 'error'); return;
+    }
+    note.title     = title || 'Untitled';
+    note.content   = document.getElementById('note-content').value;
+    note.updatedAt = Date.now();
+    if (!isEditing) note.createdAt = Date.now();
+
+    const notes = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    const idx   = notes.findIndex(n => n.id === note.id);
+    if (idx >= 0) notes[idx] = note;
+    else notes.unshift(note);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+
+    isEditing = true;
+    document.getElementById('page-title').textContent = 'Edit Note';
+    document.getElementById('edit-mode-badge').textContent = 'Editing';
+    document.getElementById('delete-section').style.display = 'block';
+    updateNoteInfo();
+
+    const si = document.getElementById('saved-indicator');
+    si.classList.add('visible');
+    setTimeout(() => si.classList.remove('visible'), 2000);
+    showToast('Note saved! ✅', 'success');
+    history.replaceState(null, '', `?id=${note.id}`);
+  }
+
+  document.getElementById('save-btn').addEventListener('click', saveNote);
+
+  // Ctrl+S shortcut
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveNote(); }
+  });
+
+  // ---- Delete ----
+  document.getElementById('delete-btn').addEventListener('click', () => {
+    if (!confirm('Delete this note? This cannot be undone.')) return;
+    const notes = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]').filter(n => n.id !== note.id);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    showToast('Note deleted', 'info');
+    setTimeout(() => location.href = 'home.html', 800);
+  });
+
+  // ---- Toast ----
+  function showToast(msg, type = 'info') {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<span>${type==='success'?'✅':type==='error'?'❌':'ℹ️'}</span> ${msg}`;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  // Init
+  updateWordCount();
+</script>
+</body>
+</html>

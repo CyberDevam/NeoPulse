@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NeoPulse Pomodoro Timer – Stay focused with the science-backed Pomodoro technique.">
+  <link rel="stylesheet" href="../CSS/shared.css">
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <link rel="stylesheet" href="../CSS/pomodoroTimer.css">
+  <title>NeoPulse – Pomodoro Timer</title>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div id="navbar-placeholder"></div>
+
+<main class="pom-page anim-fadeUp">
+  <h1>🍅 Pomodoro Timer</h1>
+  <p>Stay focused, take breaks, get more done</p>
+
+  <!-- Mode Tabs -->
+  <div class="pom-modes">
+    <button class="pom-mode-btn active" data-mode="focus">Focus</button>
+    <button class="pom-mode-btn" data-mode="short">Short Break</button>
+    <button class="pom-mode-btn" data-mode="long">Long Break</button>
+  </div>
+
+  <!-- Ring Timer -->
+  <div class="pom-ring-wrap">
+    <svg class="pom-svg" viewBox="0 0 280 280">
+      <defs>
+        <linearGradient id="ring-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="#7c4dff"/>
+          <stop offset="100%" stop-color="#00e5ff"/>
+        </linearGradient>
+      </defs>
+      <circle class="pom-ring-bg" cx="140" cy="140" r="125"/>
+      <circle class="pom-ring-progress" cx="140" cy="140" r="125" id="ring-progress"/>
+    </svg>
+    <div class="pom-timer-center">
+      <div class="pom-time-display" id="time-display">25:00</div>
+      <div class="pom-session-label" id="session-label">Focus Session</div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="pom-controls">
+    <button class="pom-btn-side" id="btn-prev" title="Previous">⏮</button>
+    <button class="pom-btn-main" id="btn-play" title="Start">▶</button>
+    <button class="pom-btn-side" id="btn-reset" title="Reset">⏹</button>
+    <button class="pom-btn-side" id="btn-skip" title="Skip">⏭</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="pom-stats">
+    <div class="pom-stat-card">
+      <div class="pom-stat-num" id="stat-sessions">0</div>
+      <div class="pom-stat-lbl">Sessions</div>
+    </div>
+    <div class="pom-stat-card">
+      <div class="pom-stat-num" id="stat-focus">0m</div>
+      <div class="pom-stat-lbl">Focus Time</div>
+    </div>
+    <div class="pom-stat-card">
+      <div class="pom-stat-num" id="stat-breaks">0</div>
+      <div class="pom-stat-lbl">Breaks</div>
+    </div>
+    <div class="pom-stat-card">
+      <div class="pom-stat-num" id="stat-streak">0</div>
+      <div class="pom-stat-lbl">Streak</div>
+    </div>
+  </div>
+
+  <!-- Session Log -->
+  <div class="pom-log">
+    <h3>📋 Today's Sessions</h3>
+    <div class="pom-log-list" id="log-list">
+      <div class="pom-log-empty" id="log-empty">No sessions yet — start your first Pomodoro!</div>
+    </div>
+  </div>
+
+  <p class="pom-ambience">💡 Tip: Put on some lo-fi music and let NeoPulse track your focus for you</p>
+</main>
+
+<!-- Toast -->
+<div id="toast-container"></div>
+
+<script>
+  // ── Load Navbar ──────────────────────────────
+  fetch('../Components/navbar.html')
+    .then(r => r.text())
+    .then(html => {
+      const ph = document.getElementById('navbar-placeholder');
+      ph.innerHTML = html;
+      ph.querySelectorAll('script').forEach(s => {
+        const ns = document.createElement('script'); ns.textContent = s.textContent; document.body.appendChild(ns);
+      });
+      // Set active link
+      document.querySelectorAll('.navbar__links a').forEach(a => {
+        if (a.getAttribute('href')?.includes('pomodoro')) a.classList.add('active');
+      });
+    })
+    .catch(() => {
+      document.getElementById('navbar-placeholder').innerHTML = `<nav class="navbar">
+        <a href="landing.html" class="navbar__brand"><div class="navbar__logo">⚡</div><span class="navbar__brand-name">NeoPulse</span></a>
+        <ul class="navbar__links">
+          <li><a href="home.html"><span class="nav-icon">📝</span> Notes</a></li>
+          <li><a href="pomodoroTimer.html" class="active"><span class="nav-icon">🍅</span> Pomodoro</a></li>
+          <li><a href="about.html"><span class="nav-icon">✨</span> About</a></li>
+          <li><a href="settings.html"><span class="nav-icon">⚙️</span> Settings</a></li>
+        </ul></nav>`;
+    });
+
+  // ── Settings / Defaults ───────────────────────
+  function getSettings() {
+    const def = { focusDur: 25, shortDur: 5, longDur: 15, longAfter: 4, autoBreak: false, autoFocus: false };
+    try { return { ...def, ...JSON.parse(localStorage.getItem('neo_settings') || '{}') }; }
+    catch { return def; }
+  }
+
+  // ── Timer State ───────────────────────────────
+  const MODES = {
+    focus: { key: 'focus', label: 'Focus Session', logClass: 'focus' },
+    short: { key: 'short', label: 'Short Break',   logClass: 'break' },
+    long:  { key: 'long',  label: 'Long Break',    logClass: 'long'  },
+  };
+
+  let settings      = getSettings();
+  let mode          = 'focus';
+  let totalSecs     = settings.focusDur * 60;
+  let remainingSecs = totalSecs;
+  let running       = false;
+  let timerId       = null;
+  let completedFocus = 0;  // sessions since page load
+  let totalFocusMins = 0;
+  let totalBreaks    = 0;
+  let streak         = 0;
+  let sessionLog     = [];
+
+  const CIRC = 2 * Math.PI * 125; // 785.4
+
+  // ── DOM refs ──────────────────────────────────
+  const timeDisplay  = document.getElementById('time-display');
+  const sessionLabel = document.getElementById('session-label');
+  const ringProgress = document.getElementById('ring-progress');
+  const btnPlay      = document.getElementById('btn-play');
+  const btnReset     = document.getElementById('btn-reset');
+  const btnSkip      = document.getElementById('btn-skip');
+  const btnPrev      = document.getElementById('btn-prev');
+
+  // ── Helpers ───────────────────────────────────
+  function getDuration(m) {
+    const s = getSettings();
+    if (m === 'focus') return s.focusDur * 60;
+    if (m === 'short') return s.shortDur * 60;
+    return s.longDur * 60;
+  }
+
+  function fmt(secs) {
+    const m = String(Math.floor(secs / 60)).padStart(2, '0');
+    const s = String(secs % 60).padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  function updateRing() {
+    const progress = remainingSecs / totalSecs;
+    const offset   = CIRC * (1 - progress);
+    ringProgress.style.strokeDashoffset = offset;
+  }
+
+  function updateDisplay() {
+    timeDisplay.textContent    = fmt(remainingSecs);
+    sessionLabel.textContent   = MODES[mode].label;
+    document.title             = `${fmt(remainingSecs)} – NeoPulse Pomodoro`;
+    updateRing();
+    syncNavPill();
+  }
+
+  function syncNavPill() {
+    localStorage.setItem('neo_pom_state', JSON.stringify({
+      running: running,
+      active:  running,
+      secs:    remainingSecs,
+      mode:    mode,
+    }));
+  }
+
+  // ── Mode switch ───────────────────────────────
+  function switchMode(newMode) {
+    if (running) stopTimer();
+    mode          = newMode;
+    settings      = getSettings();
+    totalSecs     = getDuration(newMode);
+    remainingSecs = totalSecs;
+
+    document.querySelectorAll('.pom-mode-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mode === newMode);
+    });
+
+    // Ring gradient color for break modes
+    if (newMode === 'short') {
+      document.querySelector('#ring-gradient stop:first-child').setAttribute('stop-color','#00e676');
+      document.querySelector('#ring-gradient stop:last-child').setAttribute('stop-color','#69f0ae');
+    } else if (newMode === 'long') {
+      document.querySelector('#ring-gradient stop:first-child').setAttribute('stop-color','#00e5ff');
+      document.querySelector('#ring-gradient stop:last-child').setAttribute('stop-color','#80d8ff');
+    } else {
+      document.querySelector('#ring-gradient stop:first-child').setAttribute('stop-color','#7c4dff');
+      document.querySelector('#ring-gradient stop:last-child').setAttribute('stop-color','#00e5ff');
+    }
+
+    updateDisplay();
+  }
+
+  document.querySelectorAll('.pom-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+  });
+
+  // ── Timer controls ────────────────────────────
+  function startTimer() {
+    if (running) return;
+    running = true;
+    btnPlay.textContent = '⏸';
+    timeDisplay.classList.add('ticking');
+
+    timerId = setInterval(() => {
+      remainingSecs--;
+      updateDisplay();
+      if (remainingSecs <= 0) {
+        clearInterval(timerId);
+        running = false;
+        onSessionComplete();
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (!running) return;
+    running = false;
+    clearInterval(timerId);
+    btnPlay.textContent = '▶';
+    timeDisplay.classList.remove('ticking');
+    syncNavPill();
+  }
+
+  function resetTimer() {
+    stopTimer();
+    settings      = getSettings();
+    totalSecs     = getDuration(mode);
+    remainingSecs = totalSecs;
+    updateDisplay();
+  }
+
+  btnPlay.addEventListener('click', () => {
+    if (running) stopTimer();
+    else startTimer();
+  });
+  btnReset.addEventListener('click', resetTimer);
+  btnSkip.addEventListener('click', () => {
+    stopTimer();
+    onSessionComplete(true); // skip = forced complete
+  });
+  btnPrev.addEventListener('click', () => {
+    stopTimer();
+    settings      = getSettings();
+    totalSecs     = getDuration(mode);
+    remainingSecs = totalSecs;
+    updateDisplay();
+  });
+
+  // ── Session complete ─────────────────────────
+  function onSessionComplete(skipped = false) {
+    btnPlay.textContent = '▶';
+    timeDisplay.classList.remove('ticking');
+    playBeep();
+
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+    if (mode === 'focus') {
+      completedFocus++;
+      if (!skipped) {
+        totalFocusMins += getSettings().focusDur;
+        streak++;
+      }
+      addLog('focus', `Focus Session #${completedFocus}`, timeStr);
+      showToast(skipped ? 'Focus session skipped' : '🍅 Focus complete! Take a break', skipped ? 'info' : 'success');
+
+      // Auto pick next break
+      const nextMode = (completedFocus % (getSettings().longAfter || 4) === 0) ? 'long' : 'short';
+      totalBreaks++;
+      
+      updateStats();
+
+      if (getSettings().autoBreak && !skipped) {
+        setTimeout(() => switchMode(nextMode), 800);
+        setTimeout(() => startTimer(), 1200);
+      } else {
+        setTimeout(() => switchMode(nextMode), 400);
+      }
+    } else {
+      addLog(mode, MODES[mode].label, timeStr);
+      showToast('☕ Break over! Ready to focus?', 'info');
+      updateStats();
+      if (getSettings().autoFocus && !skipped) {
+        setTimeout(() => switchMode('focus'), 800);
+        setTimeout(() => startTimer(), 1200);
+      } else {
+        setTimeout(() => switchMode('focus'), 400);
+      }
+    }
+  }
+
+  // ── Stats ────────────────────────────────────
+  function updateStats() {
+    document.getElementById('stat-sessions').textContent = completedFocus;
+    document.getElementById('stat-focus').textContent    = totalFocusMins + 'm';
+    document.getElementById('stat-breaks').textContent   = totalBreaks;
+    document.getElementById('stat-streak').textContent   = streak;
+  }
+
+  // ── Session Log ──────────────────────────────
+  function addLog(type, label, time) {
+    sessionLog.unshift({ type, label, time });
+    renderLog();
+  }
+
+  function renderLog() {
+    const list  = document.getElementById('log-list');
+    const empty = document.getElementById('log-empty');
+    if (sessionLog.length === 0) { empty.style.display = ''; return; }
+    empty.style.display = 'none';
+    list.innerHTML = sessionLog.slice(0, 20).map(s =>
+      `<div class="pom-log-item ${s.type}">
+        <span class="log-type">${s.type === 'focus' ? '🍅' : s.type === 'short' ? '☕' : '🛌'} ${s.label}</span>
+        <span style="color:var(--text-muted)">${s.time}</span>
+      </div>`
+    ).join('');
+  }
+
+  // ── Audio Beep ───────────────────────────────
+  function playBeep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [0, 0.3, 0.6].forEach((delay, i) => {
+        const osc  = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type      = 'sine';
+        osc.frequency.setValueAtTime(i === 2 ? 880 : 660, ctx.currentTime + delay);
+        gain.gain.setValueAtTime(0.25, ctx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.4);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + 0.5);
+      });
+    } catch(e) {}
+  }
+
+  // ── Toast ────────────────────────────────────
+  function showToast(msg, type = 'info') {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<span>${type==='success'?'✅':type==='error'?'❌':'ℹ️'}</span> ${msg}`;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+
+  // ── Keyboard shortcuts ────────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.code === 'Space') { e.preventDefault(); btnPlay.click(); }
+    if (e.code === 'KeyR')  resetTimer();
+    if (e.code === 'KeyS')  btnSkip.click();
+  });
+
+  // ── Init ─────────────────────────────────────
+  updateDisplay();
+  renderLog();
+  updateStats();
+</script>
+</body>
+</html>

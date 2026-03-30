@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../CSS/shared.css">
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <title>NeoPulse</title>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <!-- Brand -->
+  <a href="../VIEW/landing.html" class="navbar__brand">
+    <div class="navbar__logo">⚡</div>
+    <span class="navbar__brand-name">NeoPulse</span>
+  </a>
+
+  <!-- Desktop Links -->
+  <ul class="navbar__links">
+    <li><a href="../VIEW/home.html" id="nav-home">
+      <span class="nav-icon">📝</span> Notes
+    </a></li>
+    <li><a href="../VIEW/pomodoroTimer.html" id="nav-pomodoro">
+      <span class="nav-icon">🍅</span> Pomodoro
+    </a></li>
+    <li><a href="../VIEW/about.html" id="nav-about">
+      <span class="nav-icon">✨</span> About
+    </a></li>
+    <li><a href="../VIEW/settings.html" id="nav-settings">
+      <span class="nav-icon">⚙️</span> Settings
+    </a></li>
+  </ul>
+
+  <!-- Pomodoro mini-pill (shows when timer is running) -->
+  <div class="navbar__pomodoro-pill hidden" id="nav-pom-pill" onclick="location.href='../VIEW/pomodoroTimer.html'">
+    <div class="pom-dot" id="nav-pom-dot"></div>
+    <span id="nav-pom-time">25:00</span>
+  </div>
+
+  <!-- Dark/Light Mode Toggle -->
+  <button class="navbar__theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
+    <span class="theme-toggle-icon" id="theme-toggle-icon">🌙</span>
+  </button>
+
+  <!-- Hamburger -->
+  <button class="navbar__hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile Drawer -->
+<div class="navbar__drawer" id="drawer">
+  <a href="../VIEW/home.html"><span>📝</span> Notes</a>
+  <a href="../VIEW/pomodoroTimer.html"><span>🍅</span> Pomodoro</a>
+  <a href="../VIEW/about.html"><span>✨</span> About</a>
+  <a href="../VIEW/settings.html"><span>⚙️</span> Settings</a>
+  <!-- Drawer dark/light toggle -->
+  <button class="drawer-theme-toggle" id="drawer-theme-toggle">
+    <span id="drawer-toggle-icon">🌙</span>
+    <span id="drawer-toggle-label">Dark Mode</span>
+  </button>
+</div>
+
+<script>
+  // ══════════════════════════════════════════════
+  //  THEME ENGINE  — applied globally via <html>
+  // ══════════════════════════════════════════════
+  const THEME_KEY  = 'neo_theme';
+  const MODE_KEY   = 'neo_mode';   // 'dark' | 'light'
+
+  const DARK_THEMES  = ['dark-nebula','dark-ocean','dark-forest','dark-crimson','dark-solar','dark-rose'];
+  const LIGHT_THEMES = ['light-cloud','light-arctic','light-mint','light-sunset','light-rose','light-parchment'];
+
+  function getTheme()    { return localStorage.getItem(THEME_KEY) || 'dark-nebula'; }
+  function getMode()     { return localStorage.getItem(MODE_KEY)  || 'dark'; }
+
+  function applyTheme(theme, mode) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    localStorage.setItem(MODE_KEY, mode);
+    updateToggleIcon(mode);
+  }
+
+  function updateToggleIcon(mode) {
+    const icon        = document.getElementById('theme-toggle-icon');
+    const drawerIcon  = document.getElementById('drawer-toggle-icon');
+    const drawerLabel = document.getElementById('drawer-toggle-label');
+    const isDark = mode === 'dark';
+    if (icon)        icon.textContent        = isDark ? '☀️' : '🌙';
+    if (drawerIcon)  drawerIcon.textContent  = isDark ? '☀️' : '🌙';
+    if (drawerLabel) drawerLabel.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+  }
+
+  // ---- Toggle between dark & light counterpart ----
+  function toggleMode() {
+    const current = getTheme();
+    const mode    = getMode();
+    let newTheme, newMode;
+
+    if (mode === 'dark') {
+      // Find light counterpart (same index in LIGHT_THEMES)
+      const idx = DARK_THEMES.indexOf(current);
+      newTheme = (idx >= 0) ? LIGHT_THEMES[idx] : 'light-cloud';
+      newMode  = 'light';
+    } else {
+      const idx = LIGHT_THEMES.indexOf(current);
+      newTheme = (idx >= 0) ? DARK_THEMES[idx] : 'dark-nebula';
+      newMode  = 'dark';
+    }
+    applyTheme(newTheme, newMode);
+    // Broadcast so settings page can update if open
+    localStorage.setItem('neo_theme_updated', Date.now());
+  }
+
+  // ---- Init on load ----
+  (function initTheme() {
+    const theme = getTheme();
+    const mode  = getMode();
+    applyTheme(theme, mode);
+  })();
+
+  // ---- Active Link Highlighting ----
+  (function() {
+    const path = window.location.pathname;
+    const allLinks = document.querySelectorAll('.navbar__links a, .navbar__drawer a');
+    allLinks.forEach(a => {
+      const href = a.getAttribute('href');
+      if (href && path.includes(href.split('/').pop().replace('.html',''))) {
+        a.classList.add('active');
+      }
+    });
+  })();
+
+  // ---- Hamburger / Drawer ----
+  const hamburger = document.getElementById('hamburger');
+  const drawer    = document.getElementById('drawer');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    drawer.classList.toggle('open');
+  });
+  drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    hamburger.classList.remove('open');
+    drawer.classList.remove('open');
+  }));
+
+  // ---- Toggle buttons ----
+  document.getElementById('theme-toggle').addEventListener('click', toggleMode);
+  document.getElementById('drawer-theme-toggle').addEventListener('click', () => {
+    toggleMode();
+    hamburger.classList.remove('open');
+    drawer.classList.remove('open');
+  });
+
+  // ---- Pomodoro Pill from localStorage ----
+  function updateNavPomPill() {
+    const state = JSON.parse(localStorage.getItem('neo_pom_state') || 'null');
+    const pill  = document.getElementById('nav-pom-pill');
+    const dot   = document.getElementById('nav-pom-dot');
+    const time  = document.getElementById('nav-pom-time');
+    if (state && state.running) {
+      pill.classList.remove('hidden');
+      dot.classList.toggle('paused', !state.active);
+      const m = String(Math.floor(state.secs / 60)).padStart(2,'0');
+      const s = String(state.secs % 60).padStart(2,'0');
+      time.textContent = `${m}:${s}`;
+    } else {
+      pill.classList.add('hidden');
+    }
+  }
+  setInterval(updateNavPomPill, 1000);
+  updateNavPomPill();
+</script>
+</body>
+</html>

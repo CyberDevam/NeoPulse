@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="About NeoPulse – The story behind the app, tech stack, and keyboard shortcuts.">
+  <link rel="stylesheet" href="../CSS/shared.css">
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <link rel="stylesheet" href="../CSS/about.css">
+  <title>NeoPulse – About</title>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div id="navbar-placeholder"></div>
+
+<main>
+  <!-- Hero -->
+  <div class="about-hero anim-fadeUp">
+    <div class="about-hero__orb"></div>
+    <div class="version-pill">⚡ NeoPulse v1.0</div>
+    <h1>Built for <span class="gradient-text">Focus & Flow</span></h1>
+    <p>NeoPulse is a free, privacy-first productivity app combining beautiful notes with the Pomodoro technique — everything you need to enter deep work, without the noise.</p>
+  </div>
+
+  <div class="page-container">
+
+    <!-- About cols -->
+    <div class="about-cols" style="margin-bottom:24px">
+
+      <!-- Mission -->
+      <div class="about-card anim-fadeUp" style="animation-delay:0.08s">
+        <h2>🎯 The Mission</h2>
+        <p>Most productivity apps are bloated, require accounts, and send your data to the cloud. NeoPulse is different. Everything lives in your browser — instant, private, and zero friction.</p>
+        <ul style="margin-top:16px">
+          <li>No account required — open and start immediately</li>
+          <li>All data stored locally in your browser</li>
+          <li>No ads, no subscriptions, no tracking</li>
+          <li>Simple enough to use daily, powerful enough to impress</li>
+        </ul>
+      </div>
+
+      <!-- Philosophy -->
+      <div class="about-card anim-fadeUp" style="animation-delay:0.14s">
+        <h2>🧠 The Pomodoro Technique</h2>
+        <p>Developed by Francesco Cirillo in the late 1980s, the Pomodoro Technique breaks work into focused intervals — traditionally 25 minutes — separated by short breaks. It combats mental fatigue and trains your brain to focus on demand.</p>
+        <ul style="margin-top:16px">
+          <li>25-minute focus sessions minimize distraction</li>
+          <li>5-min breaks restore attention and energy</li>
+          <li>15-min long break after every 4 sessions</li>
+          <li>Track your streaks to build lasting habits</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="about-card anim-fadeUp" style="animation-delay:0.2s;margin-bottom:24px">
+      <h2>🛠️ Tech Stack</h2>
+      <p style="margin-bottom:20px">Built entirely with vanilla web technologies — no build tools, no frameworks, no dependencies. Just fast, lightweight HTML, CSS, and JavaScript.</p>
+      <div class="tech-grid">
+        <div class="tech-card">
+          <div class="tech-card__icon">📄</div>
+          <div class="tech-card__name">HTML5</div>
+          <div class="tech-card__desc">Semantic structure</div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-card__icon">🎨</div>
+          <div class="tech-card__name">Vanilla CSS</div>
+          <div class="tech-card__desc">Custom design system</div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-card__icon">⚡</div>
+          <div class="tech-card__name">JavaScript</div>
+          <div class="tech-card__desc">ES6+, no libraries</div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-card__icon">💾</div>
+          <div class="tech-card__name">localStorage</div>
+          <div class="tech-card__desc">On-device persistence</div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-card__icon">🔊</div>
+          <div class="tech-card__name">Web Audio API</div>
+          <div class="tech-card__desc">Timer sound cues</div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-card__icon">🌐</div>
+          <div class="tech-card__name">Web Fonts</div>
+          <div class="tech-card__desc">Inter + Space Grotesk</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Keyboard shortcuts + Features -->
+    <div class="about-cols" style="margin-bottom:24px">
+      <div class="about-card anim-fadeUp" style="animation-delay:0.26s">
+        <h2>⌨️ Keyboard Shortcuts</h2>
+        <table class="kbd-table">
+          <tr>
+            <td><kbd>Space</kbd></td>
+            <td>Play / Pause Pomodoro</td>
+          </tr>
+          <tr>
+            <td><kbd>R</kbd></td>
+            <td>Reset current timer</td>
+          </tr>
+          <tr>
+            <td><kbd>S</kbd></td>
+            <td>Skip to next session</td>
+          </tr>
+          <tr>
+            <td><kbd>Ctrl</kbd> + <kbd>S</kbd></td>
+            <td>Save note (editor)</td>
+          </tr>
+          <tr>
+            <td><kbd>Ctrl</kbd> + <kbd>F</kbd></td>
+            <td>Focus search bar</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="about-card anim-fadeUp" style="animation-delay:0.32s">
+        <h2>✨ All Features</h2>
+        <ul>
+          <li>Create & edit rich text notes</li>
+          <li>Color-label notes in 10 colors</li>
+          <li>Live search & sort notes</li>
+          <li>Filter notes by color label</li>
+          <li>Note word count & metadata</li>
+          <li>SVG ring countdown timer</li>
+          <li>Focus, Short Break & Long Break modes</li>
+          <li>Auto-advance between sessions</li>
+          <li>Session log & statistics</li>
+          <li>Live Pomodoro pill in navbar</li>
+          <li>Audio beep on session end</li>
+          <li>Customizable durations in Settings</li>
+          <li>100% localStorage — no account needed</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div style="text-align:center;padding:40px 0 60px">
+      <h2 style="font-size:1.6rem;margin-bottom:12px">Ready to <span class="gradient-text">Pulse</span>? ⚡</h2>
+      <p style="color:var(--text-secondary);margin-bottom:24px">Start taking notes and focus sessions right now.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="home.html" class="btn btn-primary">📝 Open Notes</a>
+        <a href="pomodoroTimer.html" class="btn btn-secondary">🍅 Start Pomodoro</a>
+      </div>
+    </div>
+
+  </div><!-- /.page-container -->
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>Built with ❤️ · NeoPulse 2025 · <span>All data stays on your device</span></p>
+</footer>
+
+<script>
+  // Load Navbar
+  fetch('../Components/navbar.html')
+    .then(r => r.text())
+    .then(html => {
+      const ph = document.getElementById('navbar-placeholder');
+      ph.innerHTML = html;
+      ph.querySelectorAll('script').forEach(s => {
+        const ns = document.createElement('script'); ns.textContent = s.textContent; document.body.appendChild(ns);
+      });
+      document.querySelectorAll('.navbar__links a').forEach(a => {
+        if (a.getAttribute('href')?.includes('about')) a.classList.add('active');
+      });
+    })
+    .catch(() => {
+      document.getElementById('navbar-placeholder').innerHTML = `<nav class="navbar">
+        <a href="landing.html" class="navbar__brand"><div class="navbar__logo">⚡</div><span class="navbar__brand-name">NeoPulse</span></a>
+        <ul class="navbar__links">
+          <li><a href="home.html"><span class="nav-icon">📝</span> Notes</a></li>
+          <li><a href="pomodoroTimer.html"><span class="nav-icon">🍅</span> Pomodoro</a></li>
+          <li><a href="about.html" class="active"><span class="nav-icon">✨</span> About</a></li>
+          <li><a href="settings.html"><span class="nav-icon">⚙️</span> Settings</a></li>
+        </ul></nav>`;
+    });
+</script>
+</body>
+</html>
