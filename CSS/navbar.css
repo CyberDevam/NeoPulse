@@ -1,7 +1,3 @@
-/* ============================================
-   NeoPulse — Navbar Styles
-   ============================================ */
-
 .navbar {
   position: fixed;
   top: 0;
@@ -9,7 +5,7 @@
   right: 0;
   z-index: 1000;
   height: var(--nav-h);
-  background: var(--nav-bg, rgba(10,10,15,0.85));
+  background: var(--nav-bg, rgba(10, 10, 15, 0.85));
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   border-bottom: 1px solid var(--border);
@@ -20,7 +16,6 @@
   transition: background 0.35s ease, border-color 0.35s ease;
 }
 
-/* Brand */
 .navbar__brand {
   display: flex;
   align-items: center;
@@ -28,6 +23,7 @@
   text-decoration: none;
   flex-shrink: 0;
 }
+
 .navbar__logo {
   width: 34px;
   height: 34px;
@@ -37,10 +33,14 @@
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  box-shadow: 0 0 16px rgba(124,77,255,0.35);
+  box-shadow: 0 0 16px rgba(124, 77, 255, 0.35);
   transition: box-shadow var(--trans);
 }
-.navbar__brand:hover .navbar__logo { box-shadow: 0 0 26px rgba(124,77,255,0.6); }
+
+.navbar__brand:hover .navbar__logo {
+  box-shadow: 0 0 26px rgba(124, 77, 255, 0.6);
+}
+
 .navbar__brand-name {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
@@ -51,7 +51,6 @@
   background-clip: text;
 }
 
-/* Nav links */
 .navbar__links {
   display: flex;
   align-items: center;
@@ -59,6 +58,7 @@
   list-style: none;
   margin-left: auto;
 }
+
 .navbar__links a {
   display: flex;
   align-items: center;
@@ -71,22 +71,30 @@
   transition: all var(--trans);
   position: relative;
 }
-.navbar__links a:hover { color: var(--text-primary); background: var(--bg-card); }
+
+.navbar__links a:hover {
+  color: var(--text-primary);
+  background: var(--bg-card);
+}
+
 .navbar__links a.active {
   color: var(--accent-light);
   background: var(--accent-dim);
 }
-.navbar__links a .nav-icon { font-size: 1rem; line-height: 1; }
 
-/* Pomodoro indicator */
+.navbar__links a .nav-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
 .navbar__pomodoro-pill {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
   border-radius: 99px;
-  background: rgba(124,77,255,0.10);
-  border: 1px solid rgba(124,77,255,0.25);
+  background: rgba(124, 77, 255, 0.10);
+  border: 1px solid rgba(124, 77, 255, 0.25);
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--accent-light);
@@ -95,18 +103,31 @@
   flex-shrink: 0;
   margin-left: 8px;
 }
-.navbar__pomodoro-pill:hover { background: rgba(124,77,255,0.2); border-color: var(--accent); }
+
+.navbar__pomodoro-pill:hover {
+  background: rgba(124, 77, 255, 0.2);
+  border-color: var(--accent);
+}
+
 .navbar__pomodoro-pill .pom-dot {
-  width: 7px; height: 7px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--success);
   box-shadow: 0 0 6px var(--success);
   animation: pulse-glow 1.5s ease-in-out infinite;
 }
-.navbar__pomodoro-pill .pom-dot.paused { background: var(--warning); box-shadow: 0 0 6px var(--warning); animation: none; }
-.navbar__pomodoro-pill.hidden { display: none; }
 
-/* Mobile hamburger */
+.navbar__pomodoro-pill .pom-dot.paused {
+  background: var(--warning);
+  box-shadow: 0 0 6px var(--warning);
+  animation: none;
+}
+
+.navbar__pomodoro-pill.hidden {
+  display: none;
+}
+
 .navbar__hamburger {
   display: none;
   flex-direction: column;
@@ -117,24 +138,35 @@
   padding: 6px;
   margin-left: auto;
 }
+
 .navbar__hamburger span {
   display: block;
-  width: 22px; height: 2px;
+  width: 22px;
+  height: 2px;
   background: var(--text-secondary);
   border-radius: 2px;
   transition: all 0.25s ease;
 }
-.navbar__hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
-.navbar__hamburger.open span:nth-child(2) { opacity: 0; }
-.navbar__hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
 
-/* Mobile drawer */
+.navbar__hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.navbar__hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar__hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
 .navbar__drawer {
   display: none;
   position: fixed;
   top: var(--nav-h);
-  left: 0; right: 0;
-  background: rgba(10,10,15,0.97);
+  left: 0;
+  right: 0;
+  background: rgba(10, 10, 15, 0.97);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
   padding: 16px 24px 24px;
@@ -146,7 +178,14 @@
   pointer-events: none;
   transition: all 0.25s ease;
 }
-.navbar__drawer.open { display: flex; opacity: 1; transform: translateY(0); pointer-events: all; }
+
+.navbar__drawer.open {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
 .navbar__drawer a {
   display: flex;
   align-items: center;
@@ -158,18 +197,39 @@
   color: var(--text-secondary);
   transition: all var(--trans);
 }
-.navbar__drawer a:hover { color: var(--text-primary); background: var(--bg-card); }
-.navbar__drawer a.active { color: var(--accent-light); background: var(--accent-dim); }
 
-@media (max-width: 768px) {
-  .navbar { padding: 0 20px; }
-  .navbar__links { display: none; }
-  .navbar__pomodoro-pill { display: none; }
-  .navbar__hamburger { display: flex; }
-  .navbar__theme-toggle { margin-left: 0; }
+.navbar__drawer a:hover {
+  color: var(--text-primary);
+  background: var(--bg-card);
 }
 
-/* ---- Theme Toggle Button (navbar) ---- */
+.navbar__drawer a.active {
+  color: var(--accent-light);
+  background: var(--accent-dim);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 20px;
+  }
+
+  .navbar__links {
+    display: none;
+  }
+
+  .navbar__pomodoro-pill {
+    display: none;
+  }
+
+  .navbar__hamburger {
+    display: flex;
+  }
+
+  .navbar__theme-toggle {
+    margin-left: 0;
+  }
+}
+
 .navbar__theme-toggle {
   display: flex;
   align-items: center;
@@ -186,17 +246,18 @@
   transition: all var(--trans);
   margin-left: 4px;
 }
+
 .navbar__theme-toggle:hover {
   background: var(--accent-dim);
   border-color: var(--accent);
   transform: rotate(20deg) scale(1.12);
   box-shadow: 0 0 12px var(--accent-dim);
 }
+
 .navbar__theme-toggle:active {
   transform: rotate(180deg) scale(0.95);
 }
 
-/* ---- Drawer Theme Toggle ---- */
 .drawer-theme-toggle {
   display: flex;
   align-items: center;
@@ -214,6 +275,7 @@
   font-family: 'Inter', sans-serif;
   transition: all var(--trans);
 }
+
 .drawer-theme-toggle:hover {
   color: var(--accent);
   border-color: var(--accent);
